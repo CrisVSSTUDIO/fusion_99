@@ -1,0 +1,18 @@
+import './bootstrap';
+import $ from "jquery";
+import jszip from 'jszip';
+import pdfmake from 'pdfmake';
+import DataTable from 'datatables.net-bs5';
+import 'datatables.net-buttons-bs5';
+import 'datatables.net-buttons/js/buttons.colVis.mjs';
+import 'datatables.net-buttons/js/buttons.html5.mjs';
+import 'datatables.net-buttons/js/buttons.print.mjs';
+import 'datatables.net-keytable-bs5';
+import 'datatables.net-responsive-bs5';
+import 'datatables.net-scroller-bs5';
+import 'datatables.net-searchbuilder-bs5';
+import 'datatables.net-searchpanes-bs5';
+import '@google/model-viewer';
+import 'chart.js';
+window.jQuery = $;
+window.$ = $;
