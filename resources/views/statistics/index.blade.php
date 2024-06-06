@@ -36,9 +36,9 @@
             </x-card>
         </div>
         <div class="col-xl-6">
-            <x-card title="Algoritmo Apriori ">
+            <x-card title="Assets populares ">
 
-                <p>{{ $apriori }}
+                <p>{{ $assetsPopular }}
                 </p>
             </x-card>
         </div>

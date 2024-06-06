@@ -10,6 +10,7 @@ use Phpml\Metric\Accuracy;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Phpml\Clustering\DBSCAN;
+use Phpml\Clustering\KMeans;
 use App\Models\DownloadHistory;
 use Phpml\Dataset\ArrayDataset;
 use Illuminate\Routing\Controller;
@@ -212,11 +213,10 @@ class ProductController extends Controller
                 ->where('id', $files[$index]->id)
                 ->update(['filetype_prediction' => $prediction]);
         }
-        dd($classificationRport);
         // Return accuracy and predictions
         return ['accuracy' => $accuracy, 'predictions' => $predictions];
     }
-    public function DbScan()
+    public function kMeans()
     {
         $samples = [];
         $labels = [];
@@ -225,7 +225,38 @@ class ProductController extends Controller
             ->where('user_id', Auth::user()->id)
             ->whereNull('deleted_at')
             ->orderBy('filesize') // Corrected orderby clause
-            ->get();
+            ->get();  $samples = [];
+            $labels = [];
+            // Retrieve file types and sizes from the database
+            $files = Asset::select('filesize', 'filetype')
+                ->where('user_id', Auth::user()->id)
+                ->whereNull('deleted_at')
+                ->orderBy('filesize')
+                ->get();
+    
+            // Check if files collection is not empty
+            if ($files->isEmpty()) {
+                Log::error("No files found for user with ID: " . Auth::user()->id);
+                return;
+            }
+    
+            // Prepare the data for clustering
+            foreach ($files as $file) {
+                $samples[] = [$file->filesize]; // Each sample should be an array of features
+                $labels[] = $file->filetype;
+            }
+    
+            $kmeans = new KMeans(2); // Specify the number of clusters
+            $clusters = $kmeans->cluster($samples);
+    
+            // Combine the clusters with labels
+            $labeledClusters = [];
+            foreach ($clusters as $clusterIndex => $cluster) {
+                foreach ($cluster as $sampleIndex => $sample) {
+                    $labeledClusters[$labels[$sampleIndex]][] = $sample[0];
+                }
+            }
+            return $labeledClusters;
         // Check if files collection is not empty
         if ($files->isEmpty()) {
             Log::error("No files found for user with ID: " . Auth::user()->id);

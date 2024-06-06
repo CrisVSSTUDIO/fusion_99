@@ -28,8 +28,8 @@ class StatisticsController extends Controller
         //list($isVirtual, $isNotVirtual) = $this->virtualCategories();
         list($product_name, $product_count) = $this->assetPerCategory();
         list($perYear, $yearCount) = $this->assetsPerDate();
-        list($apriori) = $this->patterns();
-        return view('statistics.index', ['created_at' => json_encode($product_name), 'rowcount' => json_encode($product_count), 'averageProductsPerDay' => $averageProductsPerDay, 'perYear' => json_encode($perYear), 'yearCount' => json_encode($yearCount), 'apriori' => json_encode($apriori)]);
+        list($assetsPopular) = $this->patterns();
+        return view('statistics.index', ['created_at' => json_encode($product_name), 'rowcount' => json_encode($product_count), 'averageProductsPerDay' => $averageProductsPerDay, 'perYear' => json_encode($perYear), 'yearCount' => json_encode($yearCount), 'assetsPopular' => json_encode($assetsPopular)]);
     }
     public function assetPerCategory()
     {
@@ -119,20 +119,10 @@ class StatisticsController extends Controller
     }
     public function patterns()
     {
-        $associator = new Apriori($support = 0.5, $confidence = 0.5);
-        $samples = [];
-        $labels  = [];
-        $uploads = Asset::select('upload')->take(5000)->get();
-        if (count($uploads)) {
-            foreach ($uploads as $upload) {
-                $filextension[] = pathinfo($upload->upload, PATHINFO_EXTENSION);
-            }
-            array_push($samples, $filextension);
-            $associator->train($samples, $labels);
-            //dd($associator->getRules()) ;
-            //dd($associator->apriori());
-            return array($associator->apriori());
-        }
+        $assetsPopular = Asset::select('filetype')
+            ->groupBy('filetype')
+            ->orderByRaw('COUNT(*) DESC')
+            ->limit(10)->get()->pluck('filetype');
+        return $assetsPopular;
     }
-    
 }

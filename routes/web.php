@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{id}/restore', [ProductController::class, 'restore'])->name('restoreasset');
         Route::post('/{id}/forcedelete', [ProductController::class, 'forceDelete'])->name('deleteasset');
         Route::get('/naive-bayes', [ProductController::class, 'naiveBayes'])->name('naive-bayes');
-        Route::get('/select-k-best', [ProductController::class, 'DbScan'])->name('dbscan');
+        Route::get('/k-means', [ProductController::class, 'kMeans'])->name('k-means');
 
         Route::resource('products', ProductController::class);
     });
